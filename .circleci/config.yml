@@ -19,7 +19,7 @@ jobs:
         default: "123"
 
     docker:
-      - image: cimg/node:18.19
+      - image: cimg/node:22.8
 
     environment:
       NEXT_TELEMETRY_DISABLED: true
