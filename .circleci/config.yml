@@ -1,10 +1,10 @@
 version: 2.1
 
-# Enable pipeline parameters
+# Accept user_id from pipeline trigger
 parameters:
   user_id:
     type: string
-    default: "none"
+    default: "123"   # default value if not provided
 
 orbs:
   node: circleci/node@5.1.0
@@ -25,41 +25,40 @@ jobs:
           name: Install Dependencies
           command: npm install
 
-      # Fetch user config using pipeline parameter
+      # Fetch user config
       - run:
           name: Fetch siteConfig from Backend API
           command: |
             echo "🚀 Building site for user: << pipeline.parameters.user_id >>"
 
             # Build API URL dynamically
-            API_URL="$USER_CONFIG_API_URL?userId=<< pipeline.parameters.user_id >>"
+            API_URL="$USER_CONFIG_API_URL/<< pipeline.parameters.user_id >>"
 
             echo "Fetching config from: $API_URL"
 
-            # Get config response
+            # Call API
             curl -s "$API_URL" -o api_response.json
 
             echo "API Response:"
             cat api_response.json
 
-            # Check success
+            # Validate success
             SUCCESS=$(jq -r '.success' api_response.json)
-
             if [ "$SUCCESS" != "true" ]; then
               echo "❌ ERROR: Backend returned success=false"
               exit 1
             fi
 
-            # Make sure config folder exists
+            # Ensure config folder exists
             mkdir -p src/config
 
-            # Extract .data (actual config) into siteConfig.json
+            # Extract .data into siteConfig.json
             jq '.data' api_response.json > src/config/siteConfig.json
 
-            echo "✔ Extracted siteConfig:"
+            echo "✔ Updated siteConfig.json"
             cat src/config/siteConfig.json
 
-      # Prepare Netlify build
+      # Install Netlify CLI and plugin
       - run:
           name: Install Netlify CLI + Next Plugin
           command: |
@@ -92,21 +91,7 @@ jobs:
             echo "✔ New Site ID: $SITE_ID"
             echo "✔ Live URL: $DEPLOY_URL"
 
-            echo "$SITE_ID" > new_site_id.txt
-            echo "$DEPLOY_URL" > new_deploy_url.txt
-
-      # Send deployment info back to backend
-      - run:
-          name: Send deployment info to backend
-          command: |
-            echo "Posting deployment result back to backend..."
-
-            curl -X POST "$BACKEND_UPDATE_URL" \
-              -H "Content-Type: application/json" \
-              -H "Authorization: Bearer $API_AUTH_TOKEN" \
-              -d "{\"userId\": \"<< pipeline.parameters.user_id >>\", \"siteId\": \"$(cat new_site_id.txt)\", \"url\": \"$(cat new_deploy_url.txt)\"}"
-
-            echo "✔ Deployment info saved."
+      # (REMOVED) Sending deployment info to backend
 
       - store_artifacts:
           path: deploy_output.json
