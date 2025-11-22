@@ -18,7 +18,7 @@ jobs:
         default: "123"
 
     docker:
-      - image: cimg/node:22.8
+      - image: cimg/node:20.15   # Node 20 LTS (stable for Next.js + Netlify)
 
     environment:
       NEXT_TELEMETRY_DISABLED: true
@@ -42,6 +42,7 @@ jobs:
 
             curl -s "$API_URL" -o api_response.json
 
+            echo "API Response:"
             cat api_response.json
 
             SUCCESS=$(jq -r '.success' api_response.json)
@@ -50,37 +51,29 @@ jobs:
             mkdir -p src/config
             jq '.data' api_response.json > src/config/siteConfig.json
 
-      # Install Netlify CLI (local project install)
+      # Build static export
       - run:
-          name: Install Netlify CLI + Next Plugin
-          command: |
-            npm install netlify-cli@latest
-            npm install @netlify/plugin-nextjs
-
-      # Build project
-      - run:
-          name: Build Next.js
+          name: Build Next.js (Static Export)
           command: npm run build
 
-      # Deploy using Netlify (NO prompts)
+      # Install Netlify CLI locally
       - run:
-          name: Deploy to Netlify (Auto Create Site)
+          name: Install Netlify CLI
+          command: npm install netlify-cli@latest
+
+      # Deploy using static output
+      - run:
+          name: Deploy to Netlify (Static Export)
           command: |
-            echo "🚀 Deploying to Netlify..."
+            echo "🚀 Deploying static site to Netlify..."
 
             npx netlify deploy \
               --auth=$NETLIFY_AUTH_TOKEN \
-              --dir=".next" \
+              --dir="out" \
               --prod \
-              --json \
               --message="CI Deploy for user << parameters.user_id >>" \
               --create-site="user-<< parameters.user_id >>-site" \
-              > deploy_output.json
 
-            echo "Deploy Output:"
-            cat deploy_output.json
-
-      # Save artifacts
       - store_artifacts:
           path: deploy_output.json
           destination: deploy_output
