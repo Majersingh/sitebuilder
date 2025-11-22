@@ -9,7 +9,7 @@ import { getCardBg, getPrimaryWithOpacity } from "@/lib/colors";
 export default function Roadmap() {
     const { roadmap } = siteConfig;
 
-    if (!roadmap.enabled) return null;
+    if (!roadmap?.enabled) return null;
 
     const getStatusColor = (status: string) => {
         if (status === "completed") return siteConfig.colors.primary;

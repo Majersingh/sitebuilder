@@ -10,7 +10,7 @@ export default function Stats() {
     const { stats } = siteConfig;
     const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
 
-    if (!stats.enabled) return null;
+    if (!stats?.enabled) return null;
 
     return (
         <section
