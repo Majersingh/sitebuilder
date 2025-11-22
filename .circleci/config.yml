@@ -1,16 +1,23 @@
 version: 2.1
 
-# Accept user_id from pipeline trigger
+# Pipeline-level default parameter
 parameters:
   user_id:
     type: string
-    default: "123"   # default value if not provided
+    default: "123"   # default userId when NOT passed
 
 orbs:
   node: circleci/node@5.1.0
 
 jobs:
   build_and_deploy:
+
+    # ⭐ Job-level parameters — REQUIRED!
+    parameters:
+      user_id:
+        type: string
+        default: "123"
+
     docker:
       - image: cimg/node:18.19
 
@@ -20,57 +27,49 @@ jobs:
     steps:
       - checkout
 
-      # Install dependencies
       - run:
           name: Install Dependencies
           command: npm install
 
-      # Fetch user config
+      # Fetch siteConfig
       - run:
           name: Fetch siteConfig from Backend API
           command: |
-            echo "🚀 Building site for user: << pipeline.parameters.user_id >>"
+            echo "🚀 Building site for user: << parameters.user_id >>"
 
-            # Build API URL dynamically
-            API_URL="$USER_CONFIG_API_URL/<< pipeline.parameters.user_id >>"
+            # Build API URL
+            API_URL="$USER_CONFIG_API_URL/<< parameters.user_id >>"
 
             echo "Fetching config from: $API_URL"
 
-            # Call API
             curl -s "$API_URL" -o api_response.json
 
             echo "API Response:"
             cat api_response.json
 
-            # Validate success
             SUCCESS=$(jq -r '.success' api_response.json)
             if [ "$SUCCESS" != "true" ]; then
               echo "❌ ERROR: Backend returned success=false"
               exit 1
             fi
 
-            # Ensure config folder exists
             mkdir -p src/config
 
-            # Extract .data into siteConfig.json
             jq '.data' api_response.json > src/config/siteConfig.json
 
             echo "✔ Updated siteConfig.json"
             cat src/config/siteConfig.json
 
-      # Install Netlify CLI and plugin
       - run:
           name: Install Netlify CLI + Next Plugin
           command: |
             npm install -g netlify-cli
             npm install @netlify/plugin-nextjs
 
-      # Build Next.js
       - run:
           name: Build Project
           command: npm run build
 
-      # Deploy to Netlify
       - run:
           name: Deploy to Netlify
           command: |
@@ -90,8 +89,6 @@ jobs:
 
             echo "✔ New Site ID: $SITE_ID"
             echo "✔ Live URL: $DEPLOY_URL"
-
-      # (REMOVED) Sending deployment info to backend
 
       - store_artifacts:
           path: deploy_output.json
