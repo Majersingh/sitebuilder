@@ -59,6 +59,7 @@ export default function AdminEditWebsite() {
     // Apply
     const handleApply = async () => {
         try {
+            setDeploying(true)
             const response = await fetch(`/api/siteconfig/${config.siteName}`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -67,7 +68,6 @@ export default function AdminEditWebsite() {
 
             if (response.ok) {
                 const data = await response.json()
-                setDeploying(true)
                 setPipelineId(data.pipeline.id)
                 console.log("Deplyment response is ", data);
             } else {
@@ -138,6 +138,7 @@ export default function AdminEditWebsite() {
                             </button>
                             <button
                                 onClick={handleApply}
+                                disabled={Deploying}
                                 className="flex items-center gap-1 md:gap-2 px-2 md:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm md:text-base"
                             >
                                 <FaSave /> <span className="hidden sm:inline">Apply</span>

@@ -1,58 +1,170 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const SLUGS = [
+    "gh/Majersingh/staticwebsitegenerator",
+    "github/Majersingh/staticwebsitegenerator",
+];
+
+async function tryFetch(url: string, token: string) {
+    try {
+        const res = await fetch(url, {
+            headers: {
+                "Circle-Token": token,
+                "Accept": "application/json"
+            }
+        });
+        if (!res.ok) {
+            console.log(`Failed: ${url} - Status: ${res.status}`);
+            return null;
+        }
+        return await res.json();
+    } catch (error) {
+        console.error(`Error: ${url}`, error);
+        return null;
+    }
+}
+
+async function fetchLogOutput(url: string) {
+    try {
+        const res = await fetch(url);
+        if (!res.ok) return "";
+        return await res.text();
+    } catch {
+        return "";
+    }
+}
+
 export async function GET(req: NextRequest) {
     const pipelineId = req.nextUrl.searchParams.get("pipelineId");
-    const CIRCLECI_TOKEN = process.env.CIRCLECI_TOKEN!;
+    const token = process.env.CIRCLECI_TOKEN;
 
-    if (!pipelineId) {
-        return NextResponse.json({ success: false, error: "Missing pipelineId" });
-    }
-
-    // 1️⃣ Get workflows for this pipeline (because workflowId != pipelineId)
-    const workflowListRes = await fetch(
-        `https://circleci.com/api/v2/pipeline/${pipelineId}/workflow`,
-        {
-            headers: { "Circle-Token": CIRCLECI_TOKEN }
-        }
-    );
-
-    const workflowList = await workflowListRes.json();
-
-    if (!workflowList.items || workflowList.items.length === 0) {
+    if (!pipelineId || !token) {
         return NextResponse.json({
             success: false,
-            error: "No workflows found for this pipeline",
+            error: "Missing pipelineId or CIRCLECI_TOKEN"
         });
     }
 
-    // Always take first workflow (CircleCI usually has only one)
-    const workflowId = workflowList.items[0].id;
-
-    // 2️⃣ Get workflow details
-    const workflowRes = await fetch(
-        `https://circleci.com/api/v2/workflow/${workflowId}`,
-        {
-            headers: { "Circle-Token": CIRCLECI_TOKEN }
-        }
+    // 1️⃣ GET WORKFLOW
+    const workflowList = await tryFetch(
+        `https://circleci.com/api/v2/pipeline/${pipelineId}/workflow`,
+        token
     );
 
-    const workflow = await workflowRes.json();
+    if (!workflowList?.items?.length) {
+        return NextResponse.json({
+            success: false,
+            error: "No workflow found"
+        });
+    }
 
-    // 3️⃣ Get jobs inside workflow
-    const jobsRes = await fetch(
+    const workflow = workflowList.items[0];
+    const workflowId = workflow.id;
+
+    // 2️⃣ GET JOBS
+    const jobsData = await tryFetch(
         `https://circleci.com/api/v2/workflow/${workflowId}/job`,
-        {
-            headers: { "Circle-Token": CIRCLECI_TOKEN }
-        }
+        token
     );
 
-    const jobs = await jobsRes.json();
+    if (!jobsData?.items?.length) {
+        return NextResponse.json({
+            success: false,
+            error: "No jobs found"
+        });
+    }
+
+    // 3️⃣ FETCH LOGS FOR EACH JOB USING V1.1 API
+    const processedJobs = await Promise.all(
+        jobsData.items.map(async (job: any) => {
+            const jobWithLogs: any = {
+                ...job,
+                steps: [],
+                fullLogs: "",
+                stepDetails: [],
+                fetchStatus: "pending",
+            };
+
+            if (job.status === "not_run" || job.status === "queued") {
+                jobWithLogs.fetchStatus = "not_started";
+                return jobWithLogs;
+            }
+
+            for (const slug of SLUGS) {
+                const v1JobUrl = `https://circleci.com/api/v1.1/project/${slug}/${job.job_number}`;
+                console.log(`Fetching v1.1 job data: ${v1JobUrl}`);
+
+                const v1JobData = await tryFetch(v1JobUrl, token);
+
+                if (!v1JobData || !v1JobData.steps) {
+                    console.log(`No v1.1 data for ${slug}`);
+                    continue;
+                }
+
+                jobWithLogs.steps = v1JobData.steps;
+                let fullLogsText = "";
+                const stepDetailsArray = [];
+
+                for (const step of v1JobData.steps) {
+                    const stepDetail: any = {
+                        name: step.name,
+                        status: step.status,
+                        actions: [],
+                        logs: "",
+                    };
+
+                    if (!step.actions?.length) continue;
+
+                    for (const action of step.actions) {
+                        const actionDetail: any = {
+                            name: action.name,
+                            status: action.status,
+                            type: action.type,
+                            output: "",
+                        };
+
+                        if (action.output_url) {
+                            console.log(`Fetching logs from: ${action.output_url}`);
+                            const logText = await fetchLogOutput(action.output_url);
+                            actionDetail.output = logText;
+                            stepDetail.logs += logText;
+                            fullLogsText += logText;
+                        } else if (action.status === "running") {
+                            actionDetail.output = "[Step still running...]";
+                        }
+
+                        stepDetail.actions.push(actionDetail);
+                    }
+
+                    stepDetailsArray.push(stepDetail);
+                }
+
+                jobWithLogs.fullLogs = fullLogsText;
+                jobWithLogs.stepDetails = stepDetailsArray;
+                jobWithLogs.fetchStatus = "success";
+
+                break;
+            }
+
+            if (jobWithLogs.fetchStatus === "pending") {
+                jobWithLogs.fetchStatus = "failed";
+            }
+
+            return jobWithLogs;
+        })
+    );
 
     return NextResponse.json({
         success: true,
         pipelineId,
         workflowId,
-        workflow,
-        jobs: jobs.items || [],
+        workflow: {
+            id: workflow.id,
+            name: workflow.name,
+            status: workflow.status,
+            created_at: workflow.created_at,
+            stopped_at: workflow.stopped_at,
+        },
+        jobs: processedJobs,
     });
 }
