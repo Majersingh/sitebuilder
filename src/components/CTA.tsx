@@ -1,17 +1,24 @@
 "use client";
 
-import { siteConfig } from "@/config/siteConfig";
+import { getSiteConfig } from "@/config/prviewconfig";
+import defaultsiteConfig from "@/config/siteConfig";
+import { SiteConfig } from "@/types/config";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { FaCheck, FaArrowRight } from "react-icons/fa";
 import { getAnimationProps } from "@/lib/animations";
 import { getTextWithOpacity } from "@/lib/colors";
+import { useState, useEffect } from "react";
 
 export default function CTA() {
+    const [siteConfig, setSiteconfig] = useState<SiteConfig>(defaultsiteConfig)
     const { cta } = siteConfig;
 
     if (!cta?.enabled) return null;
 
+    useEffect(() => {
+        setSiteconfig(getSiteConfig())
+    }, [])
     return (
         <section
             className="py-20 relative overflow-hidden"

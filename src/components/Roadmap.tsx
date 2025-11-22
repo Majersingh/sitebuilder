@@ -1,13 +1,21 @@
 "use client";
 
-import { siteConfig } from "@/config/siteConfig";
+import { getSiteConfig } from "@/config/prviewconfig";
+import defaultsiteConfig from "@/config/siteConfig";
+import { SiteConfig } from "@/types/config";
 import { motion } from "framer-motion";
 import { FaCheckCircle, FaSpinner, FaClock } from "react-icons/fa";
 import { getAnimationProps } from "@/lib/animations";
 import { getCardBg, getPrimaryWithOpacity } from "@/lib/colors";
+import { useEffect, useState } from "react";
 
 export default function Roadmap() {
+    const [siteConfig, setSiteconfig] = useState<SiteConfig>(defaultsiteConfig)
     const { roadmap } = siteConfig;
+
+    useEffect(() => {
+        setSiteconfig(getSiteConfig())
+    }, [])
 
     if (!roadmap?.enabled) return null;
 

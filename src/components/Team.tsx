@@ -1,10 +1,14 @@
 "use client";
 
-import { siteConfig } from "@/config/siteConfig";
+import { getSiteConfig } from "@/config/prviewconfig";
+import defaultsiteConfig from "@/config/siteConfig";
+import { SiteConfig } from "@/types/config";
 import { motion } from "framer-motion";
 import { FaGithub, FaLinkedin, FaTwitter } from "react-icons/fa";
+import { useEffect, useState } from "react";
 
 export default function Team() {
+    const [siteConfig, setSiteConfig] = useState<SiteConfig>(defaultsiteConfig)
     const { team } = siteConfig;
 
     if (!team?.enabled) return null;

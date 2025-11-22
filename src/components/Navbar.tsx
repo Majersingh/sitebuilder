@@ -1,6 +1,8 @@
 "use client";
 
-import { siteConfig } from "@/config/siteConfig";
+import { getSiteConfig } from "@/config/prviewconfig";
+import defaultsiteConfig from "@/config/siteConfig";
+import { SiteConfig } from "@/types/config";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { FaBars, FaTimes } from "react-icons/fa";
@@ -8,11 +10,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { getCardBg, getTextWithOpacity } from "@/lib/colors";
 
 export default function Navbar() {
+    const [siteConfig, setSiteconfig] = useState<SiteConfig>(defaultsiteConfig)
     const { siteName, menuItems, showLogo, logo } = siteConfig;
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
 
     useEffect(() => {
+        setSiteconfig(getSiteConfig())
         const handleScroll = () => {
             setScrolled(window.scrollY > 50);
         };

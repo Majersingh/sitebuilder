@@ -1,14 +1,22 @@
 "use client";
 
-import { siteConfig } from "@/config/siteConfig";
+import { getSiteConfig } from "@/config/prviewconfig";
+import defaultsiteConfig from "@/config/siteConfig";
+import { SiteConfig } from "@/types/config";
 import { motion } from "framer-motion";
 import CountUp from "react-countup";
 import { useInView } from "react-intersection-observer";
 import { getAnimationProps } from "@/lib/animations";
+import { useEffect, useState } from "react";
 
 export default function Stats() {
+    const [siteConfig, setSiteConfig] = useState<SiteConfig>(defaultsiteConfig)
     const { stats } = siteConfig;
     const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.3 });
+
+    useEffect(() => {
+        setSiteConfig(getSiteConfig())
+    }, [])
 
     if (!stats?.enabled) return null;
 

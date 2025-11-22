@@ -1,13 +1,21 @@
 "use client";
 
-import { siteConfig } from "@/config/siteConfig";
+import { getSiteConfig } from "@/config/prviewconfig";
+import defaultsiteConfig from "@/config/siteConfig";
+import { SiteConfig } from "@/types/config";
 import Link from "next/link";
 import { FaFacebook, FaTwitter, FaLinkedin, FaInstagram, FaGithub, FaArrowUp } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { getDarkBg, getTextWithOpacity } from "@/lib/colors";
+import { useState, useEffect } from "react";
 
 export default function Footer() {
+    const [siteConfig, setSiteconfig] = useState<SiteConfig>(defaultsiteConfig)
     const { siteName, footer, showLogo, logo } = siteConfig;
+
+    useEffect(() => {
+        setSiteconfig(getSiteConfig())
+    }, [])
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: "smooth" });

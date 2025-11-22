@@ -1,6 +1,8 @@
 "use client";
 
-import { siteConfig } from "@/config/siteConfig";
+import { getSiteConfig } from "@/config/prviewconfig";
+import defaultsiteConfig from "@/config/siteConfig";
+import { SiteConfig } from "@/types/config";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { useState, useEffect } from "react";
@@ -8,8 +10,13 @@ import TypingText from "./TypingText";
 import { getAnimationProps, hasAnimations } from "@/lib/animations";
 
 export default function Hero() {
+    const [siteConfig, setSiteconfig] = useState<SiteConfig>(defaultsiteConfig)
     const { hero, carouselImages } = siteConfig;
     const [currentImage, setCurrentImage] = useState(0);
+
+    useEffect(() => {
+        setSiteconfig(getSiteConfig())
+    }, [])
 
     useEffect(() => {
         if (hero.showCarousel && carouselImages.length > 1) {

@@ -1,15 +1,22 @@
 "use client";
 
-import { siteConfig } from "@/config/siteConfig";
+import { getSiteConfig } from "@/config/prviewconfig";
+import defaultsiteConfig from "@/config/siteConfig";
+import { SiteConfig } from "@/types/config";
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FaChevronDown } from "react-icons/fa";
 import { getAnimationProps } from "@/lib/animations";
 import { getCardBg, getTextWithOpacity } from "@/lib/colors";
 
 export default function FAQ() {
+    const [siteConfig, setSiteconfig] = useState<SiteConfig>(defaultsiteConfig)
     const { faq } = siteConfig;
     const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+    useEffect(() => {
+        setSiteconfig(getSiteConfig())
+    }, [])
 
     if (!faq?.enabled) return null;
 

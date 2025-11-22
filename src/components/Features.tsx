@@ -1,12 +1,20 @@
 "use client";
 
-import { siteConfig } from "@/config/siteConfig";
+import { getSiteConfig } from "@/config/prviewconfig";
+import defaultsiteConfig from "@/config/siteConfig";
+import { SiteConfig } from "@/types/config";
 import { motion } from "framer-motion";
 import { getAnimationProps } from "@/lib/animations";
 import { getCardBg } from "@/lib/colors";
+import { useState, useEffect } from "react";
 
 export default function Features() {
+    const [siteConfig, setSiteconfig] = useState<SiteConfig>(defaultsiteConfig)
     const { features } = siteConfig;
+
+    useEffect(() => {
+        setSiteconfig(getSiteConfig())
+    }, [])
 
     return (
         <section

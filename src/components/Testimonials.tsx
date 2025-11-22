@@ -1,13 +1,21 @@
 "use client";
 
-import { siteConfig } from "@/config/siteConfig";
+import { getSiteConfig } from "@/config/prviewconfig";
+import defaultsiteConfig from "@/config/siteConfig";
+import { SiteConfig } from "@/types/config";
 import { motion } from "framer-motion";
 import { FaQuoteLeft, FaStar } from "react-icons/fa";
 import { getAnimationProps } from "@/lib/animations";
 import { getCardBg, getTextWithOpacity } from "@/lib/colors";
+import { useEffect, useState } from "react";
 
 export default function Testimonials() {
+    const [siteConfig, setSiteConfig] = useState<SiteConfig>(defaultsiteConfig)
     const { testimonials } = siteConfig;
+
+    useEffect(() => {
+        setSiteConfig(getSiteConfig())
+    }, [])
 
     if (!testimonials.enabled) return null;
 

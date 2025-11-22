@@ -1,10 +1,14 @@
 "use client";
 
-import { siteConfig } from "@/config/siteConfig";
+import { getSiteConfig } from "@/config/prviewconfig";
+import defaultsiteConfig from "@/config/siteConfig";
+import { SiteConfig } from "@/types/config";
 import { motion } from "framer-motion";
 import { FiMail, FiPhone, FiMapPin } from "react-icons/fi";
+import { useState, useEffect } from "react";
 
 export default function Contact() {
+    const [siteConfig, setSiteconfig] = useState<SiteConfig>(defaultsiteConfig)
     const { contact } = siteConfig;
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -26,7 +30,9 @@ export default function Contact() {
         window.location.href = mailtoLink;
     };
 
-
+    useEffect(() => {
+        setSiteconfig(getSiteConfig())
+    }, [])
     return (
         <section id="contact" className="py-20 bg-background">
             <div className="container mx-auto px-4">

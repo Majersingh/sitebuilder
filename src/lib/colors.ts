@@ -1,4 +1,4 @@
-import { siteConfig } from "@/config/siteConfig";
+import siteConfig from "@/config/siteConfig";
 
 /**
  * Utility functions to work with siteConfig colors

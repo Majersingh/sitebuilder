@@ -1,4 +1,4 @@
-import { siteConfig } from "@/config/siteConfig";
+import siteConfig from "@/config/siteConfig";
 
 /**
  * Returns animation props based on the configured animation level

@@ -1,12 +1,15 @@
 "use client";
 
-import { siteConfig } from "@/config/siteConfig";
+import { getSiteConfig } from "@/config/prviewconfig";
+import defaultsiteConfig from "@/config/siteConfig";
+import { SiteConfig } from "@/types/config";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { getAnimationProps } from "@/lib/animations";
 import { getCardBg } from "@/lib/colors";
 
 export default function About() {
+    const [siteConfig, setSiteconfig] = useState<SiteConfig>(defaultsiteConfig)
     const { about } = siteConfig;
     const ref = useRef(null);
     const { scrollYProgress } = useScroll({
@@ -16,6 +19,9 @@ export default function About() {
 
     const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
 
+    useEffect(() => {
+        setSiteconfig(getSiteConfig())
+    }, [])
     return (
         <section
             id="about"

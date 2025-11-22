@@ -13,7 +13,7 @@ import {
     BsAwardFill,
 } from "react-icons/bs";
 
-export const siteConfig: SiteConfig = {
+let siteConfig: SiteConfig = {
     siteName: "MarketMaven",
     showLogo: true,
 
@@ -408,3 +408,4 @@ export const siteConfig: SiteConfig = {
         ],
     },
 };
+export default siteConfig;
