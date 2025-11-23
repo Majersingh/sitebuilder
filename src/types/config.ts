@@ -17,13 +17,13 @@ export interface HeroSection {
 export interface Service {
     title: string;
     description: string;
-    icon: any; // React-icon component
+    icon: string; // Icon name as string (e.g., "FaCode")
 }
 
 export interface Feature {
     title: string;
     description: string;
-    icon: any;
+    icon: string; // Icon name as string (e.g., "FaCode")
 }
 
 export interface Testimonial {
@@ -172,6 +172,7 @@ export interface SiteConfig {
                 twitter?: string;
                 linkedin?: string;
                 github?: string;
+                facebook?: string;
             };
         }[];
     };

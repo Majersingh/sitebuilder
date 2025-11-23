@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { getAnimationProps } from "@/lib/animations";
 import { getCardBg, getPrimaryWithOpacity } from "@/lib/colors";
 import { useEffect, useState } from "react";
+import { getIconComponent } from "@/lib/iconMapper";
 
 export default function Services() {
     const [siteConfig, setSiteConfig] = useState<SiteConfig>(defaultsiteConfig)
@@ -45,7 +46,7 @@ export default function Services() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {services.items.map((service, index) => {
-                        const Icon = service.icon;
+                        const Icon = getIconComponent(service.icon);
                         return (
                             <motion.div
                                 key={index}

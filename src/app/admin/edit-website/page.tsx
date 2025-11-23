@@ -5,6 +5,7 @@ import defaultConfig from "@/config/siteConfig";
 import { SiteConfig } from "@/types/config";
 import CircleCIModal from "@/components/CircleCIModal";
 import { FaDownload, FaUpload, FaEye, FaSave, FaPalette, FaCog, FaList, FaPlus, FaTrash, FaBars, FaTimes } from "react-icons/fa";
+import { availableIcons } from "@/lib/iconMapper";
 
 export default function AdminEditWebsite() {
     const [config, setConfig] = useState<SiteConfig>(defaultConfig);
@@ -425,7 +426,7 @@ export default function AdminEditWebsite() {
                                                 const newItems = [...config.services.items, {
                                                     title: "New Service",
                                                     description: "Description",
-                                                    icon: "FaCode" as any
+                                                    icon: "FaCode"
                                                 }];
                                                 updateConfig(["services", "items"], newItems);
                                             }}
@@ -485,6 +486,20 @@ export default function AdminEditWebsite() {
                                                         className="w-full px-4 py-2 border rounded-lg"
                                                     />
                                                 </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium mb-2">Icon</label>
+                                                    <select
+                                                        value={item.icon}
+                                                        onChange={(e) => updateConfig(["services", "items", index, "icon"], e.target.value)}
+                                                        className="w-full px-4 py-2 border rounded-lg"
+                                                    >
+                                                        {availableIcons.map((iconName) => (
+                                                            <option key={iconName} value={iconName}>
+                                                                {iconName}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
@@ -501,7 +516,7 @@ export default function AdminEditWebsite() {
                                                 const newItems = [...config.features.items, {
                                                     title: "New Feature",
                                                     description: "Description",
-                                                    icon: "FaCode" as any
+                                                    icon: "FaCode"
                                                 }];
                                                 updateConfig(["features", "items"], newItems);
                                             }}
@@ -560,6 +575,20 @@ export default function AdminEditWebsite() {
                                                         rows={2}
                                                         className="w-full px-4 py-2 border rounded-lg"
                                                     />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-medium mb-2">Icon</label>
+                                                    <select
+                                                        value={item.icon}
+                                                        onChange={(e) => updateConfig(["features", "items", index, "icon"], e.target.value)}
+                                                        className="w-full px-4 py-2 border rounded-lg"
+                                                    >
+                                                        {availableIcons.map((iconName) => (
+                                                            <option key={iconName} value={iconName}>
+                                                                {iconName}
+                                                            </option>
+                                                        ))}
+                                                    </select>
                                                 </div>
                                             </div>
                                         </div>

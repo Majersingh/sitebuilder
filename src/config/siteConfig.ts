@@ -1,21 +1,9 @@
 import { SiteConfig } from "@/types/config";
-import {
-    FaSearch,
-    FaHandHoldingUsd,
-    FaEnvelopeOpenText,
-    FaUsers,
-    FaChartLine,
-    FaPalette,
-} from "react-icons/fa";
-import {
-    BsBarChartLineFill,
-    BsCheckCircleFill,
-    BsAwardFill,
-} from "react-icons/bs";
 
 let siteConfig: SiteConfig = {
     siteName: "MarketMaven",
     showLogo: true,
+    logo: ' ',
 
     colors: {
         primary: "#0CEAA6",  // Neon Aqua
@@ -54,32 +42,32 @@ let siteConfig: SiteConfig = {
             {
                 title: "SEO & Content Marketing",
                 description: "Rank higher on Google with proven SEO strategies and high-quality content that converts.",
-                icon: FaSearch,
+                icon: "FaSearch",
             },
             {
                 title: "Paid Advertising (PPC)",
                 description: "Drive targeted traffic and leads with Google Ads, Facebook Ads, and LinkedIn campaigns.",
-                icon: FaHandHoldingUsd,
+                icon: "FaHandHoldingUsd",
             },
             {
                 title: "Social Media Marketing",
                 description: "Build engaged communities and grow your brand across all major social platforms.",
-                icon: FaUsers,
+                icon: "FaUsers",
             },
             {
                 title: "Email & Marketing Automation",
                 description: "Nurture leads and increase conversions with automated email sequences and CRM workflows.",
-                icon: FaEnvelopeOpenText,
+                icon: "FaEnvelopeOpenText",
             },
             {
                 title: "Analytics & Conversion Optimization",
                 description: "Track performance, optimize funnels, and maximize ROI with data-driven insights.",
-                icon: FaChartLine,
+                icon: "FaChartLine",
             },
             {
                 title: "Brand Strategy & Creative",
                 description: "Develop a memorable brand identity that resonates with your target audience.",
-                icon: FaPalette,
+                icon: "FaPalette",
             },
         ],
     },
@@ -97,17 +85,17 @@ let siteConfig: SiteConfig = {
             {
                 title: "Proven Results",
                 description: "Average 3X ROI increase within first 6 months.",
-                icon: BsBarChartLineFill,
+                icon: "BsBarChartLineFill",
             },
             {
                 title: "Full Transparency",
                 description: "Real-time dashboards and monthly performance reports.",
-                icon: BsCheckCircleFill,
+                icon: "BsCheckCircleFill",
             },
             {
                 title: "Expert Team",
                 description: "Google & Meta certified specialists with 10+ years experience.",
-                icon: BsAwardFill,
+                icon: "BsAwardFill",
             },
         ],
     },
