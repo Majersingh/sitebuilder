@@ -2,7 +2,7 @@ import { SiteConfig } from "@/types/config";
 
 let siteConfig: SiteConfig = {
     siteName: "MarketMaven",
-    showLogo: true,
+    showLogo: false,
     logo: ' ',
 
     colors: {

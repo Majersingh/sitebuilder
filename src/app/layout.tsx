@@ -31,7 +31,6 @@ export default function RootLayout({
     <html lang="en" className="scroll-smooth">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        style={{ background: `linear-gradient(to bottom right, ${siteConfig.colors.background}, ${siteConfig.colors.secondary})` }}
       >
         <Navbar />
         <main className="min-h-screen">
